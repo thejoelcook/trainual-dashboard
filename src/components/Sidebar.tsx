@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import {
   HomeIcon,
@@ -12,17 +15,44 @@ import {
 } from "./Icons";
 
 const navItems = [
-  { label: "Home", icon: HomeIcon, active: true, hasChevron: false },
-  { label: "Content", icon: ContentIcon, active: false, hasChevron: true },
-  { label: "Software & tools", icon: SoftwareIcon, active: false, hasChevron: false },
-  { label: "People", icon: PeopleIcon, active: false, hasChevron: true },
-  { label: "Groups", icon: GroupsIcon, active: false, hasChevron: false },
-  { label: "Marketplaces", icon: MarketplacesIcon, active: false, hasChevron: true },
-  { label: "Reports", icon: ReportsIcon, active: false, hasChevron: true },
-  { label: "Account", icon: AccountIcon, active: false, hasChevron: true },
-];
+  { label: "Home", icon: HomeIcon, active: true },
+  {
+    label: "Content",
+    icon: ContentIcon,
+    active: false,
+    children: ["All content", "Training paths"],
+  },
+  { label: "Software & tools", icon: SoftwareIcon, active: false },
+  {
+    label: "People",
+    icon: PeopleIcon,
+    active: false,
+    children: ["Directory", "Org charts"],
+  },
+  { label: "Groups", icon: GroupsIcon, active: false },
+  {
+    label: "Marketplaces",
+    icon: MarketplacesIcon,
+    active: false,
+    children: ["Courses & templates", "Integrations", "Preferred partners"],
+  },
+  {
+    label: "Reports",
+    icon: ReportsIcon,
+    active: false,
+    children: ["Content report", "People report", "Latest activity"],
+  },
+  {
+    label: "Account",
+    icon: AccountIcon,
+    active: false,
+    children: ["Manage users", "Settings"],
+  },
+] as const;
 
 export default function Sidebar() {
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
   return (
     <aside className="w-[240px] min-w-[240px] h-full bg-white flex flex-col border-r border-gray-100">
       {/* Logo */}
@@ -33,36 +63,61 @@ export default function Sidebar() {
       </div>
 
       {/* Nav items */}
-      <nav className="flex flex-col gap-4 px-3 pt-2 pb-4 flex-1">
-        {navItems.map((item) => (
-          <a
-            key={item.label}
-            href="#"
-            className={`group flex items-center h-[46px] px-1 rounded-full transition-colors ${
-              item.active
-                ? "bg-primary-light text-primary"
-                : "text-foreground hover:bg-primary-light hover:text-primary"
-            }`}
-          >
-            <div className="w-10 h-10 flex items-center justify-center">
-              <item.icon active={item.active} />
+      <nav className="flex flex-col gap-2 px-3 pt-2 pb-4 flex-1">
+        {navItems.map((item) => {
+          const isOpen = openSection === item.label;
+          const hasChildren = Boolean(item.children?.length);
+
+          return (
+            <div key={item.label} className="flex flex-col">
+              <button
+                type="button"
+                onClick={() => setOpenSection(isOpen ? null : item.label)}
+                className={`group flex items-center h-[46px] px-1 rounded-full text-left transition-colors ${
+                  item.active
+                    ? "bg-primary-light text-primary"
+                    : "text-foreground hover:bg-primary-light hover:text-primary"
+                }`}
+              >
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <item.icon active={item.active} />
+                </div>
+                <span
+                  className={`text-base flex-1 ${
+                    item.active
+                      ? "font-medium text-primary"
+                      : "font-normal text-foreground transition-colors group-hover:text-primary"
+                  }`}
+                >
+                  {item.label}
+                </span>
+                {hasChildren && (
+                  <div
+                    className={`w-7 h-6 flex items-center justify-center text-foreground transition-transform ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  >
+                    <ChevronDownIcon />
+                  </div>
+                )}
+              </button>
+
+              {hasChildren && isOpen && (
+                <div className="flex flex-col gap-5 pt-4 pb-3 pl-[54px]">
+                  {item.children.map((child) => (
+                    <button
+                      key={child}
+                      type="button"
+                      className="text-left text-[18px] font-normal text-foreground transition-colors hover:text-primary"
+                    >
+                      {child}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <span
-              className={`text-base flex-1 ${
-                item.active
-                  ? "font-medium text-primary"
-                  : "font-normal text-foreground transition-colors group-hover:text-primary"
-              }`}
-            >
-              {item.label}
-            </span>
-            {item.hasChevron && (
-              <div className="w-7 h-6 flex items-center justify-center">
-                <ChevronDownIcon />
-              </div>
-            )}
-          </a>
-        ))}
+          );
+        })}
       </nav>
     </aside>
   );
