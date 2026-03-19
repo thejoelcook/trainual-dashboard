@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentType } from "react";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -14,7 +15,16 @@ import {
   ChevronDownIcon,
 } from "./Icons";
 
-const navItems = [
+type SidebarIcon = ComponentType<{ active?: boolean; className?: string }>;
+
+type NavItem = {
+  label: string;
+  icon: SidebarIcon;
+  active: boolean;
+  children?: readonly string[];
+};
+
+const navItems: readonly NavItem[] = [
   { label: "Home", icon: HomeIcon, active: true },
   {
     label: "Content",
@@ -66,7 +76,8 @@ export default function Sidebar() {
       <nav className="flex flex-col gap-2 px-3 pt-2 pb-4 flex-1">
         {navItems.map((item) => {
           const isOpen = openSection === item.label;
-          const hasChildren = Boolean(item.children?.length);
+          const children = item.children ?? [];
+          const hasChildren = children.length > 0;
 
           return (
             <div key={item.label} className="flex flex-col">
@@ -104,7 +115,7 @@ export default function Sidebar() {
 
               {hasChildren && isOpen && (
                 <div className="flex flex-col gap-5 pt-4 pb-3 pl-[54px]">
-                  {item.children.map((child) => (
+                  {children.map((child) => (
                     <button
                       key={child}
                       type="button"
