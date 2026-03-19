@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude_ai_Figma_Console_Read-Only__figma_take_screenshot",
+      "mcp__figma-console__figma_execute",
+      "Bash(npx create-next-app:*)"
+    ]
+  }
+}
