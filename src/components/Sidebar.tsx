@@ -38,10 +38,10 @@ export default function Sidebar() {
           <a
             key={item.label}
             href="#"
-            className={`flex items-center h-[46px] px-1 rounded-full transition-colors ${
+            className={`group flex items-center h-[46px] px-1 rounded-full transition-colors ${
               item.active
-                ? "bg-primary-light"
-                : "hover:bg-gray-50"
+                ? "bg-primary-light text-primary"
+                : "text-foreground hover:bg-primary-light hover:text-primary"
             }`}
           >
             <div className="w-10 h-10 flex items-center justify-center">
@@ -51,7 +51,7 @@ export default function Sidebar() {
               className={`text-base flex-1 ${
                 item.active
                   ? "font-medium text-primary"
-                  : "font-normal text-foreground"
+                  : "font-normal text-foreground transition-colors group-hover:text-primary"
               }`}
             >
               {item.label}
