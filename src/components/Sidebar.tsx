@@ -64,7 +64,7 @@ export default function Sidebar() {
   const [openSection, setOpenSection] = useState<string | null>(null);
 
   return (
-    <aside className="w-[240px] min-w-[240px] h-full bg-white flex flex-col border-r border-gray-100">
+    <aside className="w-[240px] min-w-[240px] h-full bg-white flex flex-col border-r border-gray-100 shadow-[0_0_10px_0_rgba(0,0,0,0.10)]">
       {/* Logo */}
       <div className="px-4 pt-4 pb-4">
         <div className="px-1 py-1">
@@ -114,12 +114,12 @@ export default function Sidebar() {
               </button>
 
               {hasChildren && isOpen && (
-                <div className="flex flex-col gap-5 pt-4 pb-3 pl-[54px]">
+                <div className="flex flex-col gap-3 pt-4 pb-3">
                   {children.map((child) => (
                     <button
                       key={child}
                       type="button"
-                      className="text-left text-[18px] font-normal text-foreground transition-colors hover:text-primary"
+                      className="w-full h-[42px] rounded-full px-[56px] text-left text-[14px] font-normal text-foreground transition-colors hover:bg-primary-light hover:text-primary"
                     >
                       {child}
                     </button>

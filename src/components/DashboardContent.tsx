@@ -65,29 +65,6 @@ export default function DashboardContent() {
 
       {/* Bottom two columns */}
       <div className="grid grid-cols-2 gap-4 mt-4">
-        {/* Content you own */}
-        <div className="bg-white rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Content you own</h3>
-          </div>
-          <div className="flex items-center gap-2 mb-4">
-            <FilterPill label="Sort" value="Recent" />
-            <FilterPill label="Status" value="Published" />
-            <button className="ml-auto text-gray-400 hover:text-gray-600">
-              <SearchSmallIcon />
-            </button>
-          </div>
-          {/* Empty state */}
-          <div className="flex flex-col items-center justify-center py-16">
-            <Image src="/assets/no_content.svg" alt="No content" width={230} height={137} />
-            <p className="text-base text-foreground mt-4">There&apos;s no content yet</p>
-            <button className="mt-4 flex items-center gap-1 px-5 h-10 rounded-full bg-primary text-white text-sm font-normal hover:bg-primary/90">
-              Create
-              <ChevronDownSmallIcon className="text-white" />
-            </button>
-          </div>
-        </div>
-
         {/* Completions */}
         <div className="bg-white rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
@@ -122,6 +99,29 @@ export default function DashboardContent() {
           {/* Spacer to match height */}
           <div className="flex-1 min-h-[200px]" />
           <p className="text-sm text-gray mt-4">Showing 1-1 of 1</p>
+        </div>
+
+        {/* Content you own */}
+        <div className="bg-white rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-foreground">Content you own</h3>
+          </div>
+          <div className="flex items-center gap-2 mb-4">
+            <FilterPill label="Sort" value="Recent" />
+            <FilterPill label="Status" value="Published" />
+            <button className="ml-auto text-gray-400 hover:text-gray-600">
+              <SearchSmallIcon />
+            </button>
+          </div>
+          {/* Empty state */}
+          <div className="flex flex-col items-center justify-center py-16">
+            <Image src="/assets/no_content.svg" alt="No content" width={230} height={137} />
+            <p className="text-base text-foreground mt-4">There&apos;s no content yet</p>
+            <button className="mt-4 flex items-center gap-1 px-5 h-10 rounded-full bg-primary text-white text-sm font-normal hover:bg-primary/90">
+              Create
+              <ChevronDownSmallIcon className="text-white" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
