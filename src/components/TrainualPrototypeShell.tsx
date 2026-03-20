@@ -4,7 +4,7 @@ import { startTransition, useCallback, useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import DashboardContent from "./DashboardContent";
-import Footer from "./Footer";
+import { LiveLearn } from "./LiveLearn";
 import type { ViewId } from "./types";
 
 export default function TrainualPrototypeShell() {
@@ -27,14 +27,16 @@ export default function TrainualPrototypeShell() {
         <Header />
 
         <div className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto bg-surface pb-[220px]">
+          <div className="flex-1 overflow-y-auto bg-surface pb-[120px]">
             <DashboardContent
               currentView={currentView}
               onNavigate={navigateToView}
             />
           </div>
-          <Footer />
         </div>
+
+        {/* Live Learn floating taskbar */}
+        <LiveLearn />
       </div>
     </div>
   );
