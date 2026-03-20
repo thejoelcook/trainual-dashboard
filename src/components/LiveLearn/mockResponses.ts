@@ -17,19 +17,19 @@ const mockResponses: MockResponse[] = [
   {
     keywords: ['training', 'path', 'create', 'order'],
     answer: 'To set the training order of content, navigate to Content > Training paths in the sidebar. Click "Create" to build a new path, then drag and drop content modules to arrange them in the sequence learners should follow. You can set prerequisites and completion targets for each step.',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoUrl: 'https://www.youtube.com/embed/9ZykJ_jJPiQ',
     videoTitle: 'Creating and Organizing Training Paths'
   },
   {
     keywords: ['user', 'add', 'invite', 'account', 'people'],
     answer: 'To add users to your account, go to Account > Manage Users in the sidebar. Click "Invite user" and enter their email address. You can assign roles (Admin, Manager, or Learner) based on permission levels. They\'ll receive an email invitation to join.',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoUrl: 'https://www.youtube.com/embed/9ZykJ_jJPiQ',
     videoTitle: 'Adding and Managing Users'
   },
   {
     keywords: ['assign', 'content', 'training'],
     answer: 'To assign content to users, select the training material from your Content library, click "Assign", then choose individuals, groups, or the entire company. Set due dates and enable notifications to track completion.',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoUrl: 'https://www.youtube.com/embed/9ZykJ_jJPiQ',
     videoTitle: 'Assigning Content to Your Team'
   },
   {
@@ -39,7 +39,7 @@ const mockResponses: MockResponse[] = [
   {
     keywords: ['report', 'progress', 'analytics'],
     answer: 'Access reports by going to Reports in the sidebar. You can view completion rates, time spent, quiz scores, and individual progress. Filter by user, group, or content type to analyze training effectiveness.',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoUrl: 'https://www.youtube.com/embed/9ZykJ_jJPiQ',
     videoTitle: 'Understanding Training Reports'
   }
 ];

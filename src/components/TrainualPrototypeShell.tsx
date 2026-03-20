@@ -9,6 +9,8 @@ import type { ViewId } from "./types";
 
 export default function TrainualPrototypeShell() {
   const [currentView, setCurrentView] = useState<ViewId>("home");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarHovering, setIsSidebarHovering] = useState(false);
 
   const navigateToView = useCallback((view: ViewId) => {
     startTransition(() => {
@@ -21,6 +23,9 @@ export default function TrainualPrototypeShell() {
       <Sidebar
         currentView={currentView}
         onNavigate={navigateToView}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
+        onHoverChange={setIsSidebarHovering}
       />
 
       <div className="relative flex min-w-0 flex-1 flex-col">
@@ -36,7 +41,7 @@ export default function TrainualPrototypeShell() {
         </div>
 
         {/* Live Learn floating taskbar */}
-        <LiveLearn />
+        <LiveLearn isSidebarCollapsed={isSidebarCollapsed} isSidebarHovering={isSidebarHovering} />
       </div>
     </div>
   );
