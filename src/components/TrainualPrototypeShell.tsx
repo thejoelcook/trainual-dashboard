@@ -5,12 +5,14 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import DashboardContent from "./DashboardContent";
 import { LiveLearn } from "./LiveLearn";
+import { TrainualUPopup } from "./TrainualUPopup";
 import type { ViewId } from "./types";
 
 export default function TrainualPrototypeShell() {
   const [currentView, setCurrentView] = useState<ViewId>("home");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSidebarHovering, setIsSidebarHovering] = useState(false);
+  const [showTrainingBarTooltip, setShowTrainingBarTooltip] = useState(false);
 
   const navigateToView = useCallback((view: ViewId) => {
     startTransition(() => {
@@ -41,8 +43,11 @@ export default function TrainualPrototypeShell() {
         </div>
 
         {/* Live Learn floating taskbar */}
-        <LiveLearn isSidebarCollapsed={isSidebarCollapsed} isSidebarHovering={isSidebarHovering} />
+        <LiveLearn isSidebarCollapsed={isSidebarCollapsed} isSidebarHovering={isSidebarHovering} showTrainingBarTooltip={showTrainingBarTooltip} onDismissTooltip={() => setShowTrainingBarTooltip(false)} />
       </div>
+
+      {/* Trainual U welcome popup */}
+      <TrainualUPopup onUseTrainingBar={() => setShowTrainingBarTooltip(true)} />
     </div>
   );
 }

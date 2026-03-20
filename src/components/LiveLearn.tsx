@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { Send, ArrowRight } from 'lucide-react';
+import { Send, ArrowRight, RotateCcw, X } from 'lucide-react';
 import { ChatContextWindow } from './LiveLearn/ChatContextWindow';
 import { getResponseForQuestion, sampleQuestions } from './LiveLearn/mockResponses';
 import type { ChatMessage } from './LiveLearn/types';
@@ -9,18 +9,31 @@ import type { ChatMessage } from './LiveLearn/types';
 type LiveLearnProps = {
   isSidebarCollapsed: boolean;
   isSidebarHovering: boolean;
+  showTrainingBarTooltip?: boolean;
+  onDismissTooltip?: () => void;
 };
 
-export function LiveLearn({ isSidebarCollapsed, isSidebarHovering }: LiveLearnProps) {
+export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingBarTooltip, onDismissTooltip }: LiveLearnProps) {
   const [input, setInput] = useState('');
   const [currentMessage, setCurrentMessage] = useState<ChatMessage | null>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showHelpSuggestions, setShowHelpSuggestions] = useState(false);
+  const [tooltipVideoEnded, setTooltipVideoEnded] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipAnimateIn, setTooltipAnimateIn] = useState(false);
+  // Second tooltip (ask anything)
+  const [showTooltip2, setShowTooltip2] = useState(false);
+  const [tooltip2VideoEnded, setTooltip2VideoEnded] = useState(false);
+  const [tooltip2Visible, setTooltip2Visible] = useState(false);
+  const [tooltip2AnimateIn, setTooltip2AnimateIn] = useState(false);
+  const hasClosedSuggestionsRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const contextWindowRef = useRef<HTMLDivElement>(null);
   const taskbarRef = useRef<HTMLDivElement>(null);
+  const tooltipVideoRef = useRef<HTMLVideoElement>(null);
+  const tooltip2VideoRef = useRef<HTMLVideoElement>(null);
 
   // Filter suggestions based on input
   const suggestions = useMemo(() => {
@@ -50,9 +63,17 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering }: LiveLearnPr
   };
 
   const handleHelpClick = useCallback(() => {
+    if (showTrainingBarTooltip) {
+      onDismissTooltip?.();
+    }
+    // If closing suggestions for the first time, trigger tooltip 2
+    if (showHelpSuggestions && !hasClosedSuggestionsRef.current) {
+      hasClosedSuggestionsRef.current = true;
+      setShowTooltip2(true);
+    }
     setShowHelpSuggestions(prev => !prev);
     setShowSuggestions(false);
-  }, []);
+  }, [showTrainingBarTooltip, onDismissTooltip, showHelpSuggestions]);
 
   const selectSuggestion = useCallback((suggestion: string) => {
     setInput(suggestion);
@@ -129,6 +150,45 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering }: LiveLearnPr
     };
   }, [showHelpSuggestions, showSuggestions]);
 
+  // Delay tooltip appearance and animate in
+  useEffect(() => {
+    if (showTrainingBarTooltip) {
+      const delayTimer = setTimeout(() => {
+        setTooltipVisible(true);
+        // Trigger animation on next frame
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setTooltipAnimateIn(true);
+          });
+        });
+      }, 800);
+      return () => clearTimeout(delayTimer);
+    } else {
+      setTooltipVisible(false);
+      setTooltipAnimateIn(false);
+      setTooltipVideoEnded(false);
+    }
+  }, [showTrainingBarTooltip]);
+
+  // Delay tooltip 2 appearance and animate in
+  useEffect(() => {
+    if (showTooltip2) {
+      const delayTimer = setTimeout(() => {
+        setTooltip2Visible(true);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setTooltip2AnimateIn(true);
+          });
+        });
+      }, 800);
+      return () => clearTimeout(delayTimer);
+    } else {
+      setTooltip2Visible(false);
+      setTooltip2AnimateIn(false);
+      setTooltip2VideoEnded(false);
+    }
+  }, [showTooltip2]);
+
   const sidebarWidth = !isSidebarCollapsed || (isSidebarCollapsed && isSidebarHovering) ? '240px' : '78px';
 
   return (
@@ -149,7 +209,7 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering }: LiveLearnPr
       <div ref={taskbarRef} className="relative w-full max-w-3xl">
         {/* Help Suggestions Dropdown */}
         {showHelpSuggestions && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 bg-white/95 backdrop-blur-md rounded-2xl border border-white/40 shadow-xl overflow-hidden">
+          <div className="absolute bottom-full left-0 right-0 mb-2 bg-white/95 backdrop-blur-md rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(88, 23, 216, 0.1)', boxShadow: '0 0 40px rgba(106, 40, 234, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3)' }}>
             <div className="px-5 py-3 border-b border-gray-200 bg-gray-50/50">
               <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Suggested Topics</p>
             </div>
@@ -195,6 +255,50 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering }: LiveLearnPr
           </div>
         )}
 
+        {/* Ask Anything Video Tooltip (Tooltip 2) */}
+        {tooltip2Visible && (
+          <div
+            className={`absolute bottom-full left-0 mb-4 z-50 flex flex-col items-start transition-all duration-[750ms] ease-out origin-bottom-left ${
+              tooltip2AnimateIn
+                ? 'opacity-100 scale-100 translate-y-0'
+                : 'opacity-0 scale-90 translate-y-4'
+            }`}
+          >
+            <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+              <video
+                ref={tooltip2VideoRef}
+                autoPlay
+                playsInline
+                className="w-72 block"
+                onEnded={() => setTooltip2VideoEnded(true)}
+              >
+                <source src="/assets/videos/video-step2.mp4" type="video/mp4" />
+              </video>
+              {tooltip2VideoEnded && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTooltip2VideoEnded(false);
+                    if (tooltip2VideoRef.current) {
+                      tooltip2VideoRef.current.currentTime = 0;
+                      tooltip2VideoRef.current.play();
+                    }
+                  }}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
+                >
+                  <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                    <RotateCcw className="w-6 h-6 text-[#1a1145]" />
+                  </div>
+                </button>
+              )}
+            </div>
+            {/* Arrow pointing down */}
+            <div className="pl-8">
+              <div className="w-0 h-0 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
+            </div>
+          </div>
+        )}
+
         <form
           onSubmit={handleSubmit}
           className="bg-white/60 backdrop-blur-md rounded-full border border-white/30 flex items-center gap-3 px-6 py-3 transition-all"
@@ -209,6 +313,7 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering }: LiveLearnPr
             onChange={(e) => {
               setInput(e.target.value);
               setShowHelpSuggestions(false);
+              if (showTooltip2) setShowTooltip2(false);
             }}
             onKeyDown={handleKeyDown}
             placeholder="Ask anything..."
@@ -216,7 +321,48 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering }: LiveLearnPr
             autoComplete="off"
           />
 
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center gap-2">
+          {/* Training Bar Video Tooltip */}
+          {tooltipVisible && (
+            <div
+              className={`absolute bottom-full right-0 mb-4 w-72 z-50 flex flex-col items-end transition-all duration-[750ms] ease-out origin-bottom-right ${
+                tooltipAnimateIn
+                  ? 'opacity-100 scale-100 translate-y-0'
+                  : 'opacity-0 scale-90 translate-y-4'
+              }`}
+            >
+              <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+                <video
+                  ref={tooltipVideoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full aspect-video"
+                  onEnded={() => setTooltipVideoEnded(true)}
+                >
+                  <source src="/assets/videos/video-step1.mp4" type="video/mp4" />
+                </video>
+                {tooltipVideoEnded && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTooltipVideoEnded(false);
+                      if (tooltipVideoRef.current) {
+                        tooltipVideoRef.current.currentTime = 0;
+                        tooltipVideoRef.current.play();
+                      }
+                    }}
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                      <RotateCcw className="w-6 h-6 text-[#1a1145]" />
+                    </div>
+                  </button>
+                )}
+              </div>
+              {/* Arrow pointing down */}
+              <div className="w-0 h-0 mr-3 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
+            </div>
+          )}
           <button
             type={input.trim() ? "submit" : "button"}
             onClick={input.trim() ? undefined : handleHelpClick}
@@ -225,6 +371,8 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering }: LiveLearnPr
           >
             {input.trim() ? (
               <Send className="w-5 h-5 text-white" />
+            ) : showHelpSuggestions ? (
+              <X className="w-5 h-5 text-white" />
             ) : (
               <span className="text-white text-xl font-semibold">?</span>
             )}
