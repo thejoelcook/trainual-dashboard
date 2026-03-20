@@ -26,3 +26,24 @@ body {
   color: var(--foreground);
   font-family: 'Poppins', sans-serif;
 }
+
+.live-learn-highlight {
+  box-shadow:
+    0 0 0 2px rgba(106, 40, 234, 0.22),
+    0 0 0 8px rgba(106, 40, 234, 0.08);
+  animation: live-learn-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes live-learn-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px rgba(106, 40, 234, 0.18),
+      0 0 0 8px rgba(106, 40, 234, 0.07);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(106, 40, 234, 0.32),
+      0 0 0 14px rgba(106, 40, 234, 0.12);
+  }
+}

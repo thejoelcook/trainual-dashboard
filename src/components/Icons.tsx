@@ -96,6 +96,42 @@ export function MarketplacesIcon({ active, className }: { active?: boolean; clas
   );
 }
 
+export function TemplatesIcon({ active, className }: { active?: boolean; className?: string }) {
+  const stroke = active ? "#6A28EA" : "currentColor";
+  return (
+    <svg
+      width="18"
+      height="16"
+      viewBox="0 0 18 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M9 1L16.5 4.5L9 8L1.5 4.5L9 1Z"
+        stroke={stroke}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3.5 8.4L9 11L14.5 8.4"
+        stroke={stroke}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3.5 12.2L9 14.8L14.5 12.2"
+        stroke={stroke}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function ReportsIcon({ active, className }: { active?: boolean; className?: string }) {
   const fill = active ? "#6A28EA" : "currentColor";
   return (
@@ -134,6 +170,14 @@ export function ChevronDownIcon({ className }: { className?: string }) {
   return (
     <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={className}>
       <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function ChevronRightIcon({ className }: { className?: string }) {
+  return (
+    <svg width="8" height="12" viewBox="0 0 8 12" fill="none" className={className}>
+      <path d="M1 1L6 6L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -210,9 +254,9 @@ export function ChevronDownSmallIcon({ className }: { className?: string }) {
   );
 }
 
-export function SearchSmallIcon() {
+export function SearchSmallIcon({ className }: { className?: string }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className={className}>
       <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.5" />
       <path d="M12 12L16 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
@@ -233,6 +277,81 @@ export function FilterIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <path d="M1 2H15L10 8.5V13L6 15V8.5L1 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function SparklesIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className={className}>
+      <path
+        d="M8 1.1L9.394 5.106L13.4 6.5L9.394 7.894L8 11.9L6.606 7.894L2.6 6.5L6.606 5.106L8 1.1Z"
+        fill="currentColor"
+      />
+      <path
+        d="M12.65 0.9L13.275 2.725L15.1 3.35L13.275 3.975L12.65 5.8L12.025 3.975L10.2 3.35L12.025 2.725L12.65 0.9Z"
+        fill="currentColor"
+      />
+      <path
+        d="M12 10.2L12.625 12.025L14.45 12.65L12.625 13.275L12 15.1L11.375 13.275L9.55 12.65L11.375 12.025L12 10.2Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function CursorClickIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 18 18" fill="none" className={className}>
+      <path
+        d="M4.2 2.5L12.7 10.1L9 10.6L10.8 15.2L8.6 16L6.8 11.4L4.3 13.8L4.2 2.5Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M12.8 2.8L14.2 1.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M14.6 6.5H16.6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M11.9 5.1L13 6.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function PlayCircleIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 18 18" fill="none" className={className}>
+      <circle cx="9" cy="9" r="7.25" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M7.2 5.85L12.15 9L7.2 12.15V5.85Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function ArrowUpRightIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className={className}>
+      <path d="M4 12L12 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M6 4H12V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function CloseSmallIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className={className}>
+      <path d="M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function DragHandleIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className={className}>
+      <circle cx="5" cy="4" r="1.1" fill="currentColor" />
+      <circle cx="11" cy="4" r="1.1" fill="currentColor" />
+      <circle cx="5" cy="8" r="1.1" fill="currentColor" />
+      <circle cx="11" cy="8" r="1.1" fill="currentColor" />
+      <circle cx="5" cy="12" r="1.1" fill="currentColor" />
+      <circle cx="11" cy="12" r="1.1" fill="currentColor" />
     </svg>
   );
 }
