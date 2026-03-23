@@ -1,19 +1,15 @@
 'use client';
 
-import { X, Play, ChevronLeft } from 'lucide-react';
+import { X } from 'lucide-react';
 import type { ChatMessage } from './types';
 
 type ChatContextWindowProps = {
   message: ChatMessage;
-  showVideo: boolean;
-  onToggleVideo: () => void;
   onClose: () => void;
 };
 
 export function ChatContextWindow({
   message,
-  showVideo,
-  onToggleVideo,
   onClose
 }: ChatContextWindowProps) {
   return (
@@ -41,48 +37,25 @@ export function ChatContextWindow({
         </div>
 
         {/* Content */}
-        <div className="p-6 transition-all duration-300">
-          {!showVideo ? (
-            // Text Response View
-            <div>
-              <p className="text-base leading-7 text-gray-700 mb-4">
-                {message.answer}
-              </p>
-
-              {message.videoUrl && (
-                <button
-                  onClick={onToggleVideo}
-                  className="inline-flex items-center gap-2 px-5 h-11 rounded-full bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
-                >
-                  <Play className="w-4 h-4" />
-                  Watch Video
-                </button>
-              )}
-            </div>
-          ) : (
-            // Video View
-            <div>
-              <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black mb-4">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={message.videoUrl}
-                  title={message.videoTitle || 'Training Video'}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute inset-0"
-                />
-              </div>
-
-              <button
-                onClick={onToggleVideo}
-                className="inline-flex items-center gap-2 px-5 h-11 rounded-full border border-gray-200 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back to Answer
-              </button>
+        <div className="p-6 transition-all duration-300 max-h-[60vh] overflow-y-auto">
+          {message.videoUrl && (
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black mb-4">
+              <iframe
+                width="100%"
+                height="100%"
+                src={message.videoUrl}
+                title={message.videoTitle || 'Training Video'}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0"
+              />
             </div>
           )}
+
+          <div
+            className="text-sm leading-7 text-gray-700 prose prose-sm max-w-none [&_strong]:font-semibold [&_strong]:text-gray-900 [&_strong]:block [&_strong]:mt-4 [&_strong]:mb-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-1 [&_li]:my-0.5 [&_ul_ul]:mt-0.5"
+            dangerouslySetInnerHTML={{ __html: message.answer }}
+          />
         </div>
       </div>
     </div>

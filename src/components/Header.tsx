@@ -1,7 +1,12 @@
 import Image from "next/image";
 import { SearchIcon, WhatsNewIcon, HelpCenterIcon, NotificationIcon, PlusIcon } from "./Icons";
 
-export default function Header() {
+type HeaderProps = {
+  isLiveLearnHidden?: boolean;
+  onToggleLiveLearn?: () => void;
+};
+
+export default function Header({ isLiveLearnHidden = false, onToggleLiveLearn }: HeaderProps) {
   return (
     <header className="h-[60px] min-h-[60px] bg-white flex items-center px-0 border-b border-gray-100">
       <div className="flex-1 flex items-center pl-10 pr-0">
@@ -34,8 +39,16 @@ export default function Header() {
           <PlusIcon />
         </button>
 
-        <button className="w-9 h-9 flex items-center justify-center ml-2 hover:opacity-80">
-          <Image src="/assets/top-nav/ai.svg" alt="AI" width={36} height={36} />
+        <button
+          onClick={onToggleLiveLearn}
+          className={`flex items-center justify-center ml-2 hover:opacity-80 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
+            isLiveLearnHidden
+              ? 'w-9 h-9 opacity-100 scale-100'
+              : 'w-0 h-9 opacity-0 scale-75'
+          }`}
+          aria-label="Show LiveLearn"
+        >
+          <Image src="/assets/top-nav/ai.svg" alt="AI" width={36} height={36} className="flex-shrink-0" />
         </button>
 
         <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center ml-2 text-xs font-semibold text-foreground">

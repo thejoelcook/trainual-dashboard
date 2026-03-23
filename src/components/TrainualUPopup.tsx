@@ -64,13 +64,10 @@ export function TrainualUPopup({ onUseTrainingBar }: TrainualUPopupProps) {
         {/* Content */}
         <div className="px-8 pt-6 pb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-3">
-            2 Ways to Continue Your Training
+            There&apos;s still so much more to discover with Trainual.
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed mb-2">
-            There&apos;s so much more to discover with Trainual. Learn in real time with our new Live Training Bar—just type in the task you need help with to get instant answers and helpful videos.
-          </p>
-          <p className="text-sm text-gray-600 leading-relaxed mb-6">
-            Or head over to{' '}
+            Trainual University (a.k.a. &ldquo;{' '}
             <button
               type="button"
               onClick={() => setShowVideo(true)}
@@ -79,26 +76,28 @@ export function TrainualUPopup({ onUseTrainingBar }: TrainualUPopupProps) {
               Trainual U
               <Info className="w-3.5 h-3.5 inline" />
             </button>
-            {' '}to access curated training courses tailored to your permission level.
+            {' '}&rdquo;) is designed to help you get the hang of Trainual faster.
+          </p>
+          <p className="text-sm text-gray-600 leading-relaxed mb-6">
+            You can also learn in real time with our new Training Bar. Simply search for the task you want to complete or a question you have, and get instant answers along with helpful videos.
           </p>
 
           {/* Buttons */}
           <div className="flex items-center justify-end gap-3">
             <button
-              onClick={() => setIsOpen(false)}
-              className="px-5 py-2.5 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:border-[#6A28EA] hover:bg-[#6A28EA]/5 hover:text-[#6A28EA] transition-colors"
-            >
-              Trainual U
-            </button>
-            <button
               onClick={() => {
                 setIsOpen(false);
                 onUseTrainingBar?.();
               }}
-              className="px-5 py-2.5 rounded-full bg-[#7C3AED] text-sm font-medium text-white hover:bg-[#6D28D9] transition-colors"
+              className="px-5 py-2.5 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:border-[#6A28EA] hover:bg-[#6A28EA]/5 hover:text-[#6A28EA] transition-colors"
             >
               Use Training Bar
             </button>
+            <span
+              className="px-5 py-2.5 rounded-full bg-[#7C3AED] text-sm font-medium text-white cursor-default"
+            >
+              Trainual U
+            </span>
           </div>
         </div>
       </div>

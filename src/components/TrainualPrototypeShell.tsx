@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useCallback, useState } from "react";
+import { startTransition, useCallback, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import DashboardContent from "./DashboardContent";
@@ -13,12 +13,29 @@ export default function TrainualPrototypeShell() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSidebarHovering, setIsSidebarHovering] = useState(false);
   const [showTrainingBarTooltip, setShowTrainingBarTooltip] = useState(false);
+  const [isLiveLearnHidden, setIsLiveLearnHidden] = useState(false);
 
   const navigateToView = useCallback((view: ViewId) => {
     startTransition(() => {
       setCurrentView(view);
     });
   }, []);
+
+  const toggleLiveLearn = useCallback(() => {
+    setIsLiveLearnHidden(prev => !prev);
+  }, []);
+
+  // ⌘K to toggle LiveLearn visibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey && e.key === 'k') {
+        e.preventDefault();
+        toggleLiveLearn();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [toggleLiveLearn]);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white">
@@ -31,7 +48,7 @@ export default function TrainualPrototypeShell() {
       />
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        <Header />
+        <Header isLiveLearnHidden={isLiveLearnHidden} onToggleLiveLearn={toggleLiveLearn} />
 
         <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto bg-surface pb-[120px]">
@@ -43,7 +60,7 @@ export default function TrainualPrototypeShell() {
         </div>
 
         {/* Live Learn floating taskbar */}
-        <LiveLearn isSidebarCollapsed={isSidebarCollapsed} isSidebarHovering={isSidebarHovering} showTrainingBarTooltip={showTrainingBarTooltip} onDismissTooltip={() => setShowTrainingBarTooltip(false)} />
+        <LiveLearn isSidebarCollapsed={isSidebarCollapsed} isSidebarHovering={isSidebarHovering} showTrainingBarTooltip={showTrainingBarTooltip} onDismissTooltip={() => setShowTrainingBarTooltip(false)} isHidden={isLiveLearnHidden} />
       </div>
 
       {/* Trainual U welcome popup */}

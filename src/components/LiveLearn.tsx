@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { Send, ArrowRight, RotateCcw, X } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowUp, ArrowRight, RotateCcw, X } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { ChatContextWindow } from './LiveLearn/ChatContextWindow';
 import { getResponseForQuestion, sampleQuestions } from './LiveLearn/mockResponses';
 import type { ChatMessage } from './LiveLearn/types';
@@ -11,12 +13,12 @@ type LiveLearnProps = {
   isSidebarHovering: boolean;
   showTrainingBarTooltip?: boolean;
   onDismissTooltip?: () => void;
+  isHidden?: boolean;
 };
 
-export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingBarTooltip, onDismissTooltip }: LiveLearnProps) {
+export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingBarTooltip, onDismissTooltip, isHidden = false }: LiveLearnProps) {
   const [input, setInput] = useState('');
   const [currentMessage, setCurrentMessage] = useState<ChatMessage | null>(null);
-  const [showVideo, setShowVideo] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showHelpSuggestions, setShowHelpSuggestions] = useState(false);
@@ -28,12 +30,24 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
   const [tooltip2VideoEnded, setTooltip2VideoEnded] = useState(false);
   const [tooltip2Visible, setTooltip2Visible] = useState(false);
   const [tooltip2AnimateIn, setTooltip2AnimateIn] = useState(false);
+  // Third tooltip (after first search close)
+  const [showTooltip3, setShowTooltip3] = useState(false);
+  const [tooltip3VideoEnded, setTooltip3VideoEnded] = useState(false);
+  const [tooltip3Visible, setTooltip3Visible] = useState(false);
+  const [tooltip3AnimateIn, setTooltip3AnimateIn] = useState(false);
+  // Celebration video popup (after 3rd search)
+  const [showCelebrationVideo, setShowCelebrationVideo] = useState(false);
+  const [celebrationVideoEnded, setCelebrationVideoEnded] = useState(false);
+  const [searchCount, setSearchCount] = useState(0);
   const hasClosedSuggestionsRef = useRef(false);
+  const hasClosedFirstSearchRef = useRef(false);
+  const celebrationVideoRef = useRef<HTMLVideoElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const contextWindowRef = useRef<HTMLDivElement>(null);
   const taskbarRef = useRef<HTMLDivElement>(null);
   const tooltipVideoRef = useRef<HTMLVideoElement>(null);
   const tooltip2VideoRef = useRef<HTMLVideoElement>(null);
+  const tooltip3VideoRef = useRef<HTMLVideoElement>(null);
 
   // Filter suggestions based on input
   const suggestions = useMemo(() => {
@@ -50,13 +64,58 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
     setSelectedSuggestionIndex(-1);
   }, [suggestions, input]);
 
+  const firePurpleConfetti = useCallback(() => {
+    const duration = 2500;
+    const end = Date.now() + duration;
+    const purples = ['#6A28EA', '#8B5CF6', '#A78BFA', '#C4B5FD', '#7C3AED'];
+
+    const frame = () => {
+      // Shoot from left side
+      confetti({
+        particleCount: 3,
+        angle: 30,
+        spread: 50,
+        origin: { x: 0, y: 0.5 },
+        colors: purples,
+        gravity: 0.6,
+        ticks: 400,
+        scalar: 1.1,
+        startVelocity: 45,
+      });
+      // Shoot from right side
+      confetti({
+        particleCount: 3,
+        angle: 150,
+        spread: 50,
+        origin: { x: 1, y: 0.5 },
+        colors: purples,
+        gravity: 0.6,
+        ticks: 400,
+        scalar: 1.1,
+        startVelocity: 45,
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+    frame();
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
+    const newCount = searchCount + 1;
+    setSearchCount(newCount);
+
+    if (newCount === 3) {
+      setTimeout(firePurpleConfetti, 1000);
+      setTimeout(() => setShowCelebrationVideo(true), 3000);
+    }
+
     const response = getResponseForQuestion(input);
     setCurrentMessage(response);
-    setShowVideo(false);
     setInput('');
     setShowSuggestions(false);
     setShowHelpSuggestions(false);
@@ -109,11 +168,10 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
 
   const handleClose = useCallback(() => {
     setCurrentMessage(null);
-    setShowVideo(false);
-  }, []);
-
-  const handleToggleVideo = useCallback(() => {
-    setShowVideo(prev => !prev);
+    if (!hasClosedFirstSearchRef.current) {
+      hasClosedFirstSearchRef.current = true;
+      setShowTooltip3(true);
+    }
   }, []);
 
   // Close context window when clicking outside
@@ -189,17 +247,42 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
     }
   }, [showTooltip2]);
 
+  // Delay tooltip 3 appearance and animate in
+  useEffect(() => {
+    if (showTooltip3) {
+      const delayTimer = setTimeout(() => {
+        setTooltip3Visible(true);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setTooltip3AnimateIn(true);
+          });
+        });
+      }, 800);
+      return () => clearTimeout(delayTimer);
+    } else {
+      setTooltip3Visible(false);
+      setTooltip3AnimateIn(false);
+      setTooltip3VideoEnded(false);
+    }
+  }, [showTooltip3]);
+
   const sidebarWidth = !isSidebarCollapsed || (isSidebarCollapsed && isSidebarHovering) ? '240px' : '78px';
 
   return (
-    <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 transition-[margin] duration-300" style={{ marginLeft: sidebarWidth }}>
+    <>
+    <div
+      className={`fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        isHidden
+          ? 'opacity-0 translate-y-6 pointer-events-none'
+          : 'opacity-100 translate-y-0 pointer-events-auto'
+      }`}
+      style={{ marginLeft: sidebarWidth }}
+    >
       {/* Context Window */}
       {currentMessage && (
         <div ref={contextWindowRef}>
           <ChatContextWindow
             message={currentMessage}
-            showVideo={showVideo}
-            onToggleVideo={handleToggleVideo}
             onClose={handleClose}
           />
         </div>
@@ -255,6 +338,58 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
           </div>
         )}
 
+        {/* Post-Search Video Tooltip (Tooltip 3) */}
+        {tooltip3Visible && (
+          <div
+            className={`absolute bottom-full left-0 mb-4 z-50 flex flex-col items-start transition-all duration-[750ms] ease-out origin-bottom-left ${
+              tooltip3AnimateIn
+                ? 'opacity-100 scale-100 translate-y-0'
+                : 'opacity-0 scale-90 translate-y-4'
+            }`}
+          >
+            <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+              <button
+                type="button"
+                onClick={() => setShowTooltip3(false)}
+                className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+                aria-label="Close tooltip"
+              >
+                <X className="w-3.5 h-3.5 text-white" />
+              </button>
+              <video
+                ref={tooltip3VideoRef}
+                autoPlay
+                playsInline
+                className="w-72 block"
+                onEnded={() => setTooltip3VideoEnded(true)}
+              >
+                <source src="/assets/videos/video-step3.mp4" type="video/mp4" />
+              </video>
+              {tooltip3VideoEnded && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTooltip3VideoEnded(false);
+                    if (tooltip3VideoRef.current) {
+                      tooltip3VideoRef.current.currentTime = 0;
+                      tooltip3VideoRef.current.play();
+                    }
+                  }}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
+                >
+                  <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                    <RotateCcw className="w-6 h-6 text-[#1a1145]" />
+                  </div>
+                </button>
+              )}
+            </div>
+            {/* Arrow pointing down */}
+            <div className="pl-8">
+              <div className="w-0 h-0 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
+            </div>
+          </div>
+        )}
+
         {/* Ask Anything Video Tooltip (Tooltip 2) */}
         {tooltip2Visible && (
           <div
@@ -265,6 +400,14 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
             }`}
           >
             <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+              <button
+                type="button"
+                onClick={() => setShowTooltip2(false)}
+                className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+                aria-label="Close tooltip"
+              >
+                <X className="w-3.5 h-3.5 text-white" />
+              </button>
               <video
                 ref={tooltip2VideoRef}
                 autoPlay
@@ -332,11 +475,21 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
               }`}
             >
               <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onDismissTooltip?.();
+                  }}
+                  className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+                  aria-label="Close tooltip"
+                >
+                  <X className="w-3.5 h-3.5 text-white" />
+                </button>
                 <video
                   ref={tooltipVideoRef}
                   autoPlay
                   playsInline
-                  className="w-full aspect-video"
+                  className="w-full block"
                   onEnded={() => setTooltipVideoEnded(true)}
                 >
                   <source src="/assets/videos/video-step1.mp4" type="video/mp4" />
@@ -366,20 +519,64 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
           <button
             type={input.trim() ? "submit" : "button"}
             onClick={input.trim() ? undefined : handleHelpClick}
-            className="w-10 h-10 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors"
+            className="w-10 h-10 rounded-full bg-primary hover:bg-[#5916DF] flex items-center justify-center transition-colors"
             aria-label={input.trim() ? "Send" : "Show suggested topics"}
           >
             {input.trim() ? (
-              <Send className="w-5 h-5 text-white" />
+              <ArrowUp className="w-5 h-5 text-white" />
             ) : showHelpSuggestions ? (
               <X className="w-5 h-5 text-white" />
             ) : (
-              <span className="text-white text-xl font-semibold">?</span>
+              <Image src="/assets/sparkle.svg" alt="Help" width={18} height={20} className="ml-[2px]" />
             )}
           </button>
         </div>
         </form>
       </div>
     </div>
+
+    {/* Celebration Video Popup (after 3rd search) */}
+    {showCelebrationVideo && (
+      <div className="fixed inset-0 z-[200] flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/40" onClick={() => setShowCelebrationVideo(false)} />
+        <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-2xl bg-black max-w-lg w-full mx-4">
+          <button
+            type="button"
+            onClick={() => setShowCelebrationVideo(false)}
+            className="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+            aria-label="Close video"
+          >
+            <X className="w-4 h-4 text-white" />
+          </button>
+          <video
+            ref={celebrationVideoRef}
+            autoPlay
+            playsInline
+            className="w-full block"
+            onEnded={() => setCelebrationVideoEnded(true)}
+          >
+            <source src="/assets/videos/video-step4.mp4" type="video/mp4" />
+          </video>
+          {celebrationVideoEnded && (
+            <button
+              type="button"
+              onClick={() => {
+                setCelebrationVideoEnded(false);
+                if (celebrationVideoRef.current) {
+                  celebrationVideoRef.current.currentTime = 0;
+                  celebrationVideoRef.current.play();
+                }
+              }}
+              className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
+            >
+              <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                <RotateCcw className="w-6 h-6 text-[#1a1145]" />
+              </div>
+            </button>
+          )}
+        </div>
+      </div>
+    )}
+    </>
   );
 }
