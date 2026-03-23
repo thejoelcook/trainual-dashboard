@@ -111,7 +111,13 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
 
     if (newCount === 3) {
       setTimeout(firePurpleConfetti, 1000);
-      setTimeout(() => setShowCelebrationVideo(true), 3000);
+      setTimeout(() => {
+        setShowCelebrationVideo(true);
+        if (celebrationVideoRef.current) {
+          celebrationVideoRef.current.currentTime = 0;
+          celebrationVideoRef.current.play();
+        }
+      }, 3000);
     }
 
     const response = getResponseForQuestion(input);
@@ -208,15 +214,18 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
     };
   }, [showHelpSuggestions, showSuggestions]);
 
-  // Delay tooltip appearance and animate in
+  // Delay tooltip appearance, animate in, and auto-play preloaded video
   useEffect(() => {
     if (showTrainingBarTooltip) {
       const delayTimer = setTimeout(() => {
         setTooltipVisible(true);
-        // Trigger animation on next frame
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             setTooltipAnimateIn(true);
+            if (tooltipVideoRef.current) {
+              tooltipVideoRef.current.currentTime = 0;
+              tooltipVideoRef.current.play();
+            }
           });
         });
       }, 800);
@@ -225,10 +234,11 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
       setTooltipVisible(false);
       setTooltipAnimateIn(false);
       setTooltipVideoEnded(false);
+      if (tooltipVideoRef.current) tooltipVideoRef.current.pause();
     }
   }, [showTrainingBarTooltip]);
 
-  // Delay tooltip 2 appearance and animate in
+  // Delay tooltip 2 appearance, animate in, and auto-play preloaded video
   useEffect(() => {
     if (showTooltip2) {
       const delayTimer = setTimeout(() => {
@@ -236,6 +246,10 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             setTooltip2AnimateIn(true);
+            if (tooltip2VideoRef.current) {
+              tooltip2VideoRef.current.currentTime = 0;
+              tooltip2VideoRef.current.play();
+            }
           });
         });
       }, 800);
@@ -244,10 +258,11 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
       setTooltip2Visible(false);
       setTooltip2AnimateIn(false);
       setTooltip2VideoEnded(false);
+      if (tooltip2VideoRef.current) tooltip2VideoRef.current.pause();
     }
   }, [showTooltip2]);
 
-  // Delay tooltip 3 appearance and animate in
+  // Delay tooltip 3 appearance, animate in, and auto-play preloaded video
   useEffect(() => {
     if (showTooltip3) {
       const delayTimer = setTimeout(() => {
@@ -255,6 +270,10 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             setTooltip3AnimateIn(true);
+            if (tooltip3VideoRef.current) {
+              tooltip3VideoRef.current.currentTime = 0;
+              tooltip3VideoRef.current.play();
+            }
           });
         });
       }, 800);
@@ -263,6 +282,7 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
       setTooltip3Visible(false);
       setTooltip3AnimateIn(false);
       setTooltip3VideoEnded(false);
+      if (tooltip3VideoRef.current) tooltip3VideoRef.current.pause();
     }
   }, [showTooltip3]);
 
@@ -339,108 +359,106 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
         )}
 
         {/* Post-Search Video Tooltip (Tooltip 3) */}
-        {tooltip3Visible && (
-          <div
-            className={`absolute bottom-full left-0 mb-4 z-50 flex flex-col items-start transition-all duration-[750ms] ease-out origin-bottom-left ${
-              tooltip3AnimateIn
-                ? 'opacity-100 scale-100 translate-y-0'
-                : 'opacity-0 scale-90 translate-y-4'
-            }`}
-          >
-            <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+        <div
+          className={`absolute bottom-full left-0 mb-4 z-50 flex flex-col items-start transition-all duration-[750ms] ease-out origin-bottom-left ${
+            !tooltip3Visible ? 'pointer-events-none opacity-0 scale-90 translate-y-4' :
+            tooltip3AnimateIn
+              ? 'opacity-100 scale-100 translate-y-0'
+              : 'opacity-0 scale-90 translate-y-4'
+          }`}
+        >
+          <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+            <button
+              type="button"
+              onClick={() => setShowTooltip3(false)}
+              className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+              aria-label="Close tooltip"
+            >
+              <X className="w-3.5 h-3.5 text-white" />
+            </button>
+            <video
+              ref={tooltip3VideoRef}
+              preload="auto"
+              playsInline
+              className="w-72 block"
+              onEnded={() => setTooltip3VideoEnded(true)}
+            >
+              <source src="/assets/videos/video-step3.mp4" type="video/mp4" />
+            </video>
+            {tooltip3VideoEnded && (
               <button
                 type="button"
-                onClick={() => setShowTooltip3(false)}
-                className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
-                aria-label="Close tooltip"
+                onClick={() => {
+                  setTooltip3VideoEnded(false);
+                  if (tooltip3VideoRef.current) {
+                    tooltip3VideoRef.current.currentTime = 0;
+                    tooltip3VideoRef.current.play();
+                  }
+                }}
+                className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
               >
-                <X className="w-3.5 h-3.5 text-white" />
+                <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                  <RotateCcw className="w-6 h-6 text-[#1a1145]" />
+                </div>
               </button>
-              <video
-                ref={tooltip3VideoRef}
-                autoPlay
-                playsInline
-                className="w-72 block"
-                onEnded={() => setTooltip3VideoEnded(true)}
-              >
-                <source src="/assets/videos/video-step3.mp4" type="video/mp4" />
-              </video>
-              {tooltip3VideoEnded && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTooltip3VideoEnded(false);
-                    if (tooltip3VideoRef.current) {
-                      tooltip3VideoRef.current.currentTime = 0;
-                      tooltip3VideoRef.current.play();
-                    }
-                  }}
-                  className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
-                >
-                  <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                    <RotateCcw className="w-6 h-6 text-[#1a1145]" />
-                  </div>
-                </button>
-              )}
-            </div>
-            {/* Arrow pointing down */}
-            <div className="pl-8">
-              <div className="w-0 h-0 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
-            </div>
+            )}
           </div>
-        )}
+          {/* Arrow pointing down */}
+          <div className="pl-8">
+            <div className="w-0 h-0 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
+          </div>
+        </div>
 
         {/* Ask Anything Video Tooltip (Tooltip 2) */}
-        {tooltip2Visible && (
-          <div
-            className={`absolute bottom-full left-0 mb-4 z-50 flex flex-col items-start transition-all duration-[750ms] ease-out origin-bottom-left ${
-              tooltip2AnimateIn
-                ? 'opacity-100 scale-100 translate-y-0'
-                : 'opacity-0 scale-90 translate-y-4'
-            }`}
-          >
-            <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+        <div
+          className={`absolute bottom-full left-0 mb-4 z-50 flex flex-col items-start transition-all duration-[750ms] ease-out origin-bottom-left ${
+            !tooltip2Visible ? 'pointer-events-none opacity-0 scale-90 translate-y-4' :
+            tooltip2AnimateIn
+              ? 'opacity-100 scale-100 translate-y-0'
+              : 'opacity-0 scale-90 translate-y-4'
+          }`}
+        >
+          <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+            <button
+              type="button"
+              onClick={() => setShowTooltip2(false)}
+              className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+              aria-label="Close tooltip"
+            >
+              <X className="w-3.5 h-3.5 text-white" />
+            </button>
+            <video
+              ref={tooltip2VideoRef}
+              preload="auto"
+              playsInline
+              className="w-72 block"
+              onEnded={() => setTooltip2VideoEnded(true)}
+            >
+              <source src="/assets/videos/video-step2.mp4" type="video/mp4" />
+            </video>
+            {tooltip2VideoEnded && (
               <button
                 type="button"
-                onClick={() => setShowTooltip2(false)}
-                className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
-                aria-label="Close tooltip"
+                onClick={() => {
+                  setTooltip2VideoEnded(false);
+                  if (tooltip2VideoRef.current) {
+                    tooltip2VideoRef.current.currentTime = 0;
+                    tooltip2VideoRef.current.play();
+                  }
+                }}
+                className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
               >
-                <X className="w-3.5 h-3.5 text-white" />
+                <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                  <RotateCcw className="w-6 h-6 text-[#1a1145]" />
+                </div>
               </button>
-              <video
-                ref={tooltip2VideoRef}
-                autoPlay
-                playsInline
-                className="w-72 block"
-                onEnded={() => setTooltip2VideoEnded(true)}
-              >
-                <source src="/assets/videos/video-step2.mp4" type="video/mp4" />
-              </video>
-              {tooltip2VideoEnded && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTooltip2VideoEnded(false);
-                    if (tooltip2VideoRef.current) {
-                      tooltip2VideoRef.current.currentTime = 0;
-                      tooltip2VideoRef.current.play();
-                    }
-                  }}
-                  className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
-                >
-                  <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                    <RotateCcw className="w-6 h-6 text-[#1a1145]" />
-                  </div>
-                </button>
-              )}
-            </div>
-            {/* Arrow pointing down */}
-            <div className="pl-8">
-              <div className="w-0 h-0 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
-            </div>
+            )}
           </div>
-        )}
+          {/* Arrow pointing down */}
+          <div className="pl-8">
+            <div className="w-0 h-0 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
+          </div>
+        </div>
 
         <form
           onSubmit={handleSubmit}
@@ -466,56 +484,55 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
 
         <div className="relative flex items-center gap-2">
           {/* Training Bar Video Tooltip */}
-          {tooltipVisible && (
-            <div
-              className={`absolute bottom-full right-0 mb-4 w-72 z-50 flex flex-col items-end transition-all duration-[750ms] ease-out origin-bottom-right ${
-                tooltipAnimateIn
-                  ? 'opacity-100 scale-100 translate-y-0'
-                  : 'opacity-0 scale-90 translate-y-4'
-              }`}
-            >
-              <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+          <div
+            className={`absolute bottom-full right-0 mb-4 w-72 z-50 flex flex-col items-end transition-all duration-[750ms] ease-out origin-bottom-right ${
+              !tooltipVisible ? 'pointer-events-none opacity-0 scale-90 translate-y-4' :
+              tooltipAnimateIn
+                ? 'opacity-100 scale-100 translate-y-0'
+                : 'opacity-0 scale-90 translate-y-4'
+            }`}
+          >
+            <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-xl bg-black">
+              <button
+                type="button"
+                onClick={() => {
+                  onDismissTooltip?.();
+                }}
+                className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+                aria-label="Close tooltip"
+              >
+                <X className="w-3.5 h-3.5 text-white" />
+              </button>
+              <video
+                ref={tooltipVideoRef}
+                preload="auto"
+                playsInline
+                className="w-full block"
+                onEnded={() => setTooltipVideoEnded(true)}
+              >
+                <source src="/assets/videos/video-step1.mp4" type="video/mp4" />
+              </video>
+              {tooltipVideoEnded && (
                 <button
                   type="button"
                   onClick={() => {
-                    onDismissTooltip?.();
+                    setTooltipVideoEnded(false);
+                    if (tooltipVideoRef.current) {
+                      tooltipVideoRef.current.currentTime = 0;
+                      tooltipVideoRef.current.play();
+                    }
                   }}
-                  className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
-                  aria-label="Close tooltip"
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
                 >
-                  <X className="w-3.5 h-3.5 text-white" />
+                  <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                    <RotateCcw className="w-6 h-6 text-[#1a1145]" />
+                  </div>
                 </button>
-                <video
-                  ref={tooltipVideoRef}
-                  autoPlay
-                  playsInline
-                  className="w-full block"
-                  onEnded={() => setTooltipVideoEnded(true)}
-                >
-                  <source src="/assets/videos/video-step1.mp4" type="video/mp4" />
-                </video>
-                {tooltipVideoEnded && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTooltipVideoEnded(false);
-                      if (tooltipVideoRef.current) {
-                        tooltipVideoRef.current.currentTime = 0;
-                        tooltipVideoRef.current.play();
-                      }
-                    }}
-                    className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                      <RotateCcw className="w-6 h-6 text-[#1a1145]" />
-                    </div>
-                  </button>
-                )}
-              </div>
-              {/* Arrow pointing down */}
-              <div className="w-0 h-0 mr-3 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
+              )}
             </div>
-          )}
+            {/* Arrow pointing down */}
+            <div className="w-0 h-0 mr-3 -mt-[2px]" style={{ borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #1a1145' }} />
+          </div>
           <button
             type={input.trim() ? "submit" : "button"}
             onClick={input.trim() ? undefined : handleHelpClick}
@@ -536,47 +553,45 @@ export function LiveLearn({ isSidebarCollapsed, isSidebarHovering, showTrainingB
     </div>
 
     {/* Celebration Video Popup (after 3rd search) */}
-    {showCelebrationVideo && (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/40" onClick={() => setShowCelebrationVideo(false)} />
-        <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-2xl bg-black max-w-lg w-full mx-4">
+    <div className={`fixed inset-0 z-[200] flex items-center justify-center transition-opacity duration-300 ${showCelebrationVideo ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className="absolute inset-0 bg-black/40" onClick={() => setShowCelebrationVideo(false)} />
+      <div className="relative rounded-2xl overflow-hidden border-2 border-[#1a1145] shadow-2xl bg-black max-w-lg w-full mx-4">
+        <button
+          type="button"
+          onClick={() => setShowCelebrationVideo(false)}
+          className="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+          aria-label="Close video"
+        >
+          <X className="w-4 h-4 text-white" />
+        </button>
+        <video
+          ref={celebrationVideoRef}
+          preload="auto"
+          playsInline
+          className="w-full block"
+          onEnded={() => setCelebrationVideoEnded(true)}
+        >
+          <source src="/assets/videos/video-step4.mp4" type="video/mp4" />
+        </video>
+        {celebrationVideoEnded && (
           <button
             type="button"
-            onClick={() => setShowCelebrationVideo(false)}
-            className="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
-            aria-label="Close video"
+            onClick={() => {
+              setCelebrationVideoEnded(false);
+              if (celebrationVideoRef.current) {
+                celebrationVideoRef.current.currentTime = 0;
+                celebrationVideoRef.current.play();
+              }
+            }}
+            className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
           >
-            <X className="w-4 h-4 text-white" />
+            <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+              <RotateCcw className="w-6 h-6 text-[#1a1145]" />
+            </div>
           </button>
-          <video
-            ref={celebrationVideoRef}
-            autoPlay
-            playsInline
-            className="w-full block"
-            onEnded={() => setCelebrationVideoEnded(true)}
-          >
-            <source src="/assets/videos/video-step4.mp4" type="video/mp4" />
-          </video>
-          {celebrationVideoEnded && (
-            <button
-              type="button"
-              onClick={() => {
-                setCelebrationVideoEnded(false);
-                if (celebrationVideoRef.current) {
-                  celebrationVideoRef.current.currentTime = 0;
-                  celebrationVideoRef.current.play();
-                }
-              }}
-              className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
-            >
-              <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                <RotateCcw className="w-6 h-6 text-[#1a1145]" />
-              </div>
-            </button>
-          )}
-        </div>
+        )}
       </div>
-    )}
+    </div>
     </>
   );
 }
