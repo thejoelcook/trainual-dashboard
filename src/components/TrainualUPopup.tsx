@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HelpCircle, Shield, ClipboardCheck, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 type TrainualUPopupProps = {
   onUseTrainingBar?: () => void;
@@ -34,30 +34,12 @@ export function TrainualUPopup({ onUseTrainingBar }: TrainualUPopupProps) {
             />
           </div>
         ) : (
-          <div className="relative bg-gradient-to-br from-[#7C3AED] to-[#6D28D9] px-8 pt-10 pb-12 flex items-center justify-center">
-            {/* Decorative sparkles */}
-            <svg className="absolute top-6 left-12 w-4 h-4 text-white/40" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
-            </svg>
-            <svg className="absolute bottom-8 left-16 w-3 h-3 text-white/30" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
-            </svg>
-            <svg className="absolute top-10 right-16 w-3 h-3 text-white/30" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
-            </svg>
-
-            {/* Icons group */}
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                <HelpCircle className="w-7 h-7 text-white" />
-              </div>
-              <div className="w-18 h-18 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center border border-white/30 scale-110">
-                <Shield className="w-9 h-9 text-white" />
-              </div>
-              <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                <ClipboardCheck className="w-7 h-7 text-white" />
-              </div>
-            </div>
+          <div className="w-full">
+            <img
+              src="/assets/pop-up-image.png"
+              alt="Trainual U"
+              className="w-full h-auto block"
+            />
           </div>
         )}
 
@@ -89,7 +71,7 @@ export function TrainualUPopup({ onUseTrainingBar }: TrainualUPopupProps) {
                 setIsOpen(false);
                 onUseTrainingBar?.();
               }}
-              className="px-5 py-2.5 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:border-[#6A28EA] hover:bg-[#6A28EA]/5 hover:text-[#6A28EA] transition-colors"
+              className="px-5 py-2.5 rounded-full border border-[#6A28EA] text-sm font-medium text-[#6A28EA] hover:bg-[#6A28EA]/5 transition-colors"
             >
               Use Training Bar
             </button>
